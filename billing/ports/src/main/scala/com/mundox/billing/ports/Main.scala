@@ -1,10 +1,11 @@
 package com.mundox.billing.ports
 
 import com.mundox.billing.core.domain.DummyOrder
+import com.mundox.billing.core.env.log.Logger
 
-object Main extends App {
+object Main extends App with Logger {
 
-  println("Billing service starting...")
+  loggerInfo("Billing service starting...")
   val dummyOrder: DummyOrder = DummyOrder(0)
   println(dummyOrder)
 }
