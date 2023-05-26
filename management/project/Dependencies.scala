@@ -15,10 +15,11 @@ object Dependencies {
   lazy val akkaStream = "com.typesafe.akka" %% "akka-stream" % akkaVersion
   lazy val akkaHttp =  "com.typesafe.akka" %% "akka-http" % akkaHttpVersion
   lazy val jacksonModule = "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
+  lazy val sprayJsonAkka = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
 
   lazy val portsDependencies: Seq[ModuleID] = Seq(
     akkaActorTyped, akkaStream, akkaHttp,
-    jacksonModule
+    jacksonModule, sprayJsonAkka,
   )
 
   lazy val commonDependencies: Seq[ModuleID] = Seq(
