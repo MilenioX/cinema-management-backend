@@ -7,4 +7,5 @@ import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
   implicit val dummyCreateMovieRequestDTOFormat: RootJsonFormat[DummyCreateMovieRequestDTO] = jsonFormat1(DummyCreateMovieRequestDTO.apply)
+  implicit val dummyMovieResponseDTO: RootJsonFormat[DummyMovieResponseDTO] = jsonFormat2(DummyMovieResponseDTO.apply)
 }

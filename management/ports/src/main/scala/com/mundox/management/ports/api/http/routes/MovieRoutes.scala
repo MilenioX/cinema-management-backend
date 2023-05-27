@@ -3,14 +3,12 @@ package com.mundox.management.ports.api.http.routes
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.mundox.management.core.env.log.Logger
 import com.mundox.management.ports.api.http.JsonSupport
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
@@ -34,14 +32,8 @@ class MovieRoutes extends Logger with JsonSupport {
 
         onComplete(result) {
           case Success(value) =>
-            val mapper = JsonMapper
-              .builder()
-              .addModule(DefaultScalaModule)
-              .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES)
-              .build()
-
             loggerInfo("success response in getMovies service")
-            complete(StatusCodes.OK -> mapper.writeValueAsString(value))
+            complete(StatusCodes.OK -> value)
           case Failure(ex) =>
             loggerError(s"getMovies service has an error: $ex")
             complete(StatusCodes.InternalServerError, ex.getMessage)
@@ -54,20 +46,15 @@ class MovieRoutes extends Logger with JsonSupport {
       post {
         entity(as[DummyCreateMovieRequestDTO]) { movie =>
           loggerInfo("addMovie service invoked")
-          val result: Future[DummyCreateMovieRequestDTO] = Await.ready(
+          val result: Future[DummyMovieResponseDTO] = Await.ready(
             Future {
-              movie
+              DummyMovieResponseDTO(UUID.randomUUID().toString, movie.title)
             }, 10.seconds)
 
           onComplete(result) {
             case Success(value) =>
-              val mapper = JsonMapper
-                .builder()
-                .addModule(DefaultScalaModule)
-                .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES)
-                .build()
               loggerInfo("success response in addMovie service")
-              complete(StatusCodes.OK -> mapper.writeValueAsString(value))
+              complete(StatusCodes.OK -> value)
             case Failure(ex) =>
               loggerError(s"addMovie service has an error: $ex")
               complete(StatusCodes.InternalServerError, ex.getMessage)
