@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.mundox.management.core.env.log.Logger
+import com.mundox.management.ports.api.http.JsonSupport
+import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -14,10 +16,10 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
-class MovieRoutes extends Logger {
+class MovieRoutes extends Logger with JsonSupport {
 
   def getRoutes: Route =
-    getMovies
+    getMovies ~ addMovie()
 
   private def getMovies: Route =
     path("movies") {
@@ -47,4 +49,30 @@ class MovieRoutes extends Logger {
       }
     }
 
+  private def addMovie(): Route =
+    path("movies") {
+      post {
+        entity(as[DummyCreateMovieRequestDTO]) { movie =>
+          loggerInfo("addMovie service invoked")
+          val result: Future[DummyCreateMovieRequestDTO] = Await.ready(
+            Future {
+              movie
+            }, 10.seconds)
+
+          onComplete(result) {
+            case Success(value) =>
+              val mapper = JsonMapper
+                .builder()
+                .addModule(DefaultScalaModule)
+                .enable(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES)
+                .build()
+              loggerInfo("success response in addMovie service")
+              complete(StatusCodes.OK -> mapper.writeValueAsString(value))
+            case Failure(ex) =>
+              loggerError(s"addMovie service has an error: $ex")
+              complete(StatusCodes.InternalServerError, ex.getMessage)
+          }
+        }
+      }
+    }
 }
