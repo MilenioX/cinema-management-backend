@@ -1,23 +1,21 @@
 package com.mundox.management.ports.validations
 
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
-import cats.data._
-import cats.data.Validated._
-import cats.syntax.all._
+import com.mundox.management.ports.validations.data.{MaxLength, Validation, ValueHasSpecialCharacters}
 
 sealed trait FormValidation {
   def validateSpecialCharacters(field: String, value: String): Either[Validation, String] =
     Either.cond(
       value.matches("^[a-zA-Z0-9]"),
       value,
-      StringHasSpecialCharacters(field)
+      ValueHasSpecialCharacters(field)
     )
 
   def validateMaxLength(field: String, value: String) : Either[Validation, String] =
     Either.cond(
       value.length < 20,
       value,
-      StringMaxLength(field)
+      MaxLength(field)
     )
 
   def validateForm(domain: DummyCreateMovieRequestDTO): Either[Validation, DummyCreateMovieRequestDTO] = {
