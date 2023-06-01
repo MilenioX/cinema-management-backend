@@ -30,7 +30,7 @@ class MovieRoutesTest extends TestSpec with JsonSupport {
   "The movies post service" should "return a list of error in the title movie value" in {
     Post("/management/movies").withEntity(ContentTypes.`application/json`, "{\"title\":\"This is an *&example of error validation for the input user received in the backEnd services\"}") ~> apiRoutes.routes ~> check {
       status shouldEqual BadRequest
-      responseAs[String] shouldEqual "title must not contain special characters."
+      responseAs[String] shouldEqual "title must not contain special characters.,title has more than maximum characters allowed."
     }
   }
 }

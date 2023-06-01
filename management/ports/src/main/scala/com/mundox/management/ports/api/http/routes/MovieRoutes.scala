@@ -48,11 +48,11 @@ class MovieRoutes extends Logger with JsonSupport {
           loggerInfo("addMovie service invoked")
           val result =
             for {
-              validation <- Await.ready (Future{DummyCreateMovieRequestDTO.validate(movie)}, 5.seconds)
+              validation <- Await.ready (Future{DummyCreateMovieRequestDTO.validateNec(movie)}, 5.seconds)
               res <- Await.ready(Future {
                     Right(DummyMovieResponseDTO(UUID.randomUUID().toString, movie.title))
                   }, 10.seconds)
-            } yield validation.fold(v => Left(List(v)), _ => res)
+            } yield validation.fold(v => Left(v), _ => res)
 
           onComplete(result) {
             case Success(value) =>
