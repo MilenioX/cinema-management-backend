@@ -8,10 +8,10 @@ trait ValidatorNec {
 
   type ValidationResult[A] = ValidatedNec[Validation, A]
 
-  private val specialCharactersPattern = "^[a-zA-Z0-9]"
+  private val specialCharactersWithSpacesPattern = "^[a-zA-Z0-9 ]*"
 
-  def validateSpecialCharacters(field: String, value: String): ValidationResult[String] =
-    if (value.matches(specialCharactersPattern))
+  def validateSpecialWithSpacesCharacters(field: String, value: String): ValidationResult[String] =
+    if (value.matches(specialCharactersWithSpacesPattern))
       value.validNec[Validation]
     else
       ValueHasSpecialCharacters(field).invalidNec[String]

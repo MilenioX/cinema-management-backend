@@ -6,11 +6,11 @@ sealed trait Validator {
 
   type ValidationResult[A] = Either[Validation, A]
 
-  private val specialCharactersPattern = "^[a-zA-Z0-9]"
+  private val specialCharactersWithSpacesPattern = "^[a-zA-Z0-9 ]*"
 
-  def validateSpecialCharacters(field: String, value: String): ValidationResult[String] =
+  def validateSpecialWithSpacesCharacters(field: String, value: String): ValidationResult[String] =
     Either.cond(
-      value.matches(specialCharactersPattern),
+      value.matches(specialCharactersWithSpacesPattern),
       value,
       ValueHasSpecialCharacters(field)
     )
