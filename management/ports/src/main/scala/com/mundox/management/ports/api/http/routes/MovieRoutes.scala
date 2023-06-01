@@ -46,15 +46,24 @@ class MovieRoutes extends Logger with JsonSupport {
       post {
         entity(as[DummyCreateMovieRequestDTO]) { movie =>
           loggerInfo("addMovie service invoked")
-          val result: Future[DummyMovieResponseDTO] = Await.ready(
-            Future {
-              DummyMovieResponseDTO(UUID.randomUUID().toString, movie.title)
-            }, 10.seconds)
+          val result =
+            for {
+              validation <- Await.ready (Future{DummyCreateMovieRequestDTO.validate(movie)}, 5.seconds)
+              res <- Await.ready(Future {
+                    Right(DummyMovieResponseDTO(UUID.randomUUID().toString, movie.title))
+                  }, 10.seconds)
+            } yield validation.fold(v => Left(List(v)), _ => res)
 
           onComplete(result) {
             case Success(value) =>
-              loggerInfo("success response in addMovie service")
-              complete(StatusCodes.OK -> value)
+              value match {
+                case Left(err) =>
+                  loggerError(s"addMovie service has an error: $err")
+                  complete(StatusCodes.BadRequest, err.map(_.errorMessage).mkString(","))
+                case Right(value) =>
+                  loggerInfo("success response in addMovie service")
+                  complete(StatusCodes.OK -> value)
+              }
             case Failure(ex) =>
               loggerError(s"addMovie service has an error: $ex")
               complete(StatusCodes.InternalServerError, ex.getMessage)
