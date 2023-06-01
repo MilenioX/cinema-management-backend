@@ -4,6 +4,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import com.mundox.management.core.env.log.Logger
+import com.mundox.management.core.queries.DummyMoviesQuery
 import com.mundox.management.ports.api.http.JsonSupport
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
@@ -14,7 +15,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
-class MovieRoutes extends Logger with JsonSupport {
+class MovieRoutes(query: DummyMoviesQuery) extends Logger with JsonSupport {
 
   def getRoutes: Route =
     getMovies ~ addMovie()
@@ -23,17 +24,18 @@ class MovieRoutes extends Logger with JsonSupport {
     path("movies") {
       get {
         loggerInfo("getMovies service invoked")
-        val result: Future[List[DummyMovieResponseDTO]] = Await.ready(Future {
-          List(
-            DummyMovieResponseDTO("123", "Movie 1"),
-            DummyMovieResponseDTO("321", "Movie 2")
-          )
-        }, 10.seconds)
+        val result = query.getMovies
 
         onComplete(result) {
           case Success(value) =>
-            loggerInfo("success response in getMovies service")
-            complete(StatusCodes.OK -> value)
+            value match {
+              case Left(err) =>
+                loggerError(s"getMovies service has an error: $err")
+                complete(StatusCodes.BadRequest, err.getMessage)
+              case Right(v) =>
+                loggerInfo("success response in getMovies service")
+                complete(StatusCodes.OK -> v.map(DummyMovieResponseDTO(_)))
+            }
           case Failure(ex) =>
             loggerError(s"getMovies service has an error: $ex")
             complete(StatusCodes.InternalServerError, ex.getMessage)
