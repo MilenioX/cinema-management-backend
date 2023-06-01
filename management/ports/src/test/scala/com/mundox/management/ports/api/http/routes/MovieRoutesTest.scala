@@ -3,14 +3,14 @@ package com.mundox.management.ports.api.http.routes
 import akka.http.scaladsl.model.{ContentTypes, MediaTypes}
 import akka.http.scaladsl.model.StatusCodes.{BadRequest, OK}
 import akka.http.scaladsl.model.headers.`Content-Type`
-import com.mundox.management.ports.TestSpec
+import com.mundox.management.ports.{TestEnvironment, TestSpec}
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.{JsonSupport, ManagementAPI}
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
 class MovieRoutesTest extends TestSpec with JsonSupport {
 
-  val apiRoutes: ManagementAPI = new ManagementAPI
+  val apiRoutes: ManagementAPI = new ManagementAPI(TestEnvironment)
 
   val movieReq: DummyCreateMovieRequestDTO = DummyCreateMovieRequestDTO("Testing Movie")
 
