@@ -10,7 +10,7 @@ trait ValidatorNec {
 
   private val specialCharactersWithSpacesPattern = "^[a-zA-Z0-9 ]*"
 
-  def validateSpecialWithSpacesCharacters(field: String, value: String): ValidationResult[String] =
+  def validateSpecialCharactersWithSpaces(field: String, value: String): ValidationResult[String] =
     if (value.matches(specialCharactersWithSpacesPattern))
       value.validNec[Validation]
     else
