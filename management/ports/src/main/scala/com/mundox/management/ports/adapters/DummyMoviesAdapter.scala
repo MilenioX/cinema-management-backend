@@ -1,5 +1,6 @@
 package com.mundox.management.ports.adapters
 
+import cats.data.EitherT
 import com.mundox.management.core.domain.DummyMovie
 import com.mundox.management.core.exceptions.{AdapterError, ManagementException}
 import com.mundox.management.core.services.DummyMoviesService
@@ -33,14 +34,16 @@ class DummyMoviesAdapter extends DummyMoviesService {
     }
   }, 5.seconds)
 
-  override def addMovie(newMovie: DummyMovie): Future[Either[ManagementException, Option[DummyMovie]]] = Await.ready(Future {
-    try {
-      moviesList = moviesList :+ newMovie
-      Right(Option(newMovie))
-    } catch {
-      case e: Exception => Left(AdapterError(e.getMessage))
-    }
-  }, 5.seconds)
+  override def addMovie(newMovie: DummyMovie): EitherT[Future, ManagementException, Option[DummyMovie]] = EitherT {
+    Await.ready(Future[Either[ManagementException, Option[DummyMovie]]] {
+      try {
+        moviesList = moviesList :+ newMovie
+        Right(Option(newMovie))
+      } catch {
+        case e: Exception => Left(AdapterError(e.getMessage))
+      }
+    }, 5.seconds)
+  }
 
   override def updateMovie(id: String, updatedMovie: DummyMovie): Future[Either[ManagementException, Option[DummyMovie]]] = Await.ready(Future {
     try {

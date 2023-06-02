@@ -1,5 +1,6 @@
 package com.mundox.management.core.services
 
+import cats.data.EitherT
 import com.mundox.management.core.domain.DummyMovie
 import com.mundox.management.core.exceptions.ManagementException
 
@@ -11,7 +12,7 @@ trait DummyMoviesService {
 
   def getMovieById(id: String): Future[Either[ManagementException,Option[DummyMovie]]]
 
-  def addMovie(newMovie: DummyMovie): Future[Either[ManagementException,Option[DummyMovie]]]
+  def addMovie(newMovie: DummyMovie): EitherT[Future, ManagementException,Option[DummyMovie]]
 
   def updateMovie(id: String, updatedMovie: DummyMovie): Future[Either[ManagementException,Option[DummyMovie]]]
 
