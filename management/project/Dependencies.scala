@@ -24,13 +24,13 @@ object Dependencies {
   lazy val sprayJsonAkka = "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion
 
   lazy val portsDependencies: Seq[ModuleID] = Seq(
-    cats,
     akkaActorTyped, akkaStream, akkaHttp,
     akkaStreamTest, akkaHttpTest,
     sprayJsonAkka,
   )
 
   lazy val commonDependencies: Seq[ModuleID] = Seq(
+    cats,
     log4jScala, log4jCore,
     scalaTest, mockito,
   )

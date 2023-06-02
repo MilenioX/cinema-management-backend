@@ -1,8 +1,8 @@
 package com.mundox.management.ports.api.http.routes
 
+import com.mundox.management.core.validations.data.{MaxLength, ValueHasSpecialCharacters}
 import com.mundox.management.ports.TestSpec
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
-import com.mundox.management.ports.validations.data.{MaxLength, ValueHasSpecialCharacters}
 
 class DummyCreateMovieRequestDTOTest extends TestSpec {
 

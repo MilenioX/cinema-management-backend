@@ -1,9 +1,8 @@
 package com.mundox.management.ports.api.http.requests
 
 import cats.implicits._
-import com.mundox.management.ports.validations.data.Validation
-import com.mundox.management.ports.validations.validators.Validator
-import com.mundox.management.ports.validations.validators.ValidatorNec
+import com.mundox.management.core.validations.data.Validation
+import com.mundox.management.core.validations.validators.{Validator, ValidatorNec}
 
 case class DummyCreateMovieRequestDTO(title: String)
 
