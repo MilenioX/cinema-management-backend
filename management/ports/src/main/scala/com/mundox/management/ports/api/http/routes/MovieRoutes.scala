@@ -60,8 +60,8 @@ class MovieRoutes(query: DummyMoviesQuery) extends Logger with JsonSupport {
             case Success(value) =>
               value match {
                 case Left(err) =>
-                  loggerError(s"addMovie service has an error: $err")
-                  complete(StatusCodes.BadRequest, err.map(_.errorMessage).mkString(","))
+                  loggerError(s"addMovie service has an error: ${err.errorMsg}")
+                  complete(StatusCodes.BadRequest, err.errorMsg)
                 case Right(value) =>
                   loggerInfo("success response in addMovie service")
                   complete(StatusCodes.OK -> value)
