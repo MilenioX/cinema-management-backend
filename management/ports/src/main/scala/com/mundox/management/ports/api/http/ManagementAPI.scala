@@ -9,7 +9,7 @@ import com.mundox.management.ports.Environment
 
 class ManagementAPI(environment: Environment) {
 
-  private val movieRoutes = new MovieRoutes(environment.dummyMoviesQuery)
+  private val movieRoutes = new MovieRoutes(environment.dummyMoviesQuery, environment.dummyMoviesCommand)
 
   def routes(): Route = {
     pathPrefix("management") {

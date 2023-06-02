@@ -3,10 +3,12 @@ package com.mundox.management.ports.api.http.routes
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
+import com.mundox.management.core.commands.DummyMoviesCommand
 import com.mundox.management.core.env.log.Logger
 import com.mundox.management.core.queries.DummyMoviesQuery
 import com.mundox.management.ports.api.http.JsonSupport
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
+import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO.toDomain
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
 import java.util.UUID
@@ -15,7 +17,7 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
-class MovieRoutes(query: DummyMoviesQuery) extends Logger with JsonSupport {
+class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends Logger with JsonSupport {
 
   def getRoutes: Route =
     getMovies ~ addMovie()
@@ -50,13 +52,11 @@ class MovieRoutes(query: DummyMoviesQuery) extends Logger with JsonSupport {
           loggerInfo("addMovie service invoked")
           val result =
             for {
-              validation <- Await.ready (Future{DummyCreateMovieRequestDTO.validateNec(movie)}, 5.seconds)
-              res <- Await.ready(Future {
-                    Right(DummyMovieResponseDTO(UUID.randomUUID().toString, movie.title))
-                  }, 10.seconds)
-            } yield validation.fold(v => Left(v), _ => res)
+              validation <- DummyCreateMovieRequestDTO.validateNec(movie)
+              res <- command.addMovie(toDomain(validation))
+            } yield res
 
-          onComplete(result) {
+          onComplete(result.value) {
             case Success(value) =>
               value match {
                 case Left(err) =>
@@ -64,7 +64,7 @@ class MovieRoutes(query: DummyMoviesQuery) extends Logger with JsonSupport {
                   complete(StatusCodes.BadRequest, err.errorMsg)
                 case Right(value) =>
                   loggerInfo("success response in addMovie service")
-                  complete(StatusCodes.OK -> value)
+                  complete(StatusCodes.OK -> value.map(DummyMovieResponseDTO(_)))
               }
             case Failure(ex) =>
               loggerError(s"addMovie service has an error: $ex")

@@ -15,6 +15,9 @@ trait Environment {
   // Queries
   lazy val dummyMoviesQuery: DummyMoviesQuery = new DummyMoviesQuery(dummyMoviesService)
 
+  // Commands
+  lazy val dummyMoviesCommand: DummyMoviesCommand = new DummyMoviesCommand(dummyMoviesService)
+
   def startEnvironment(api: ManagementAPI): Unit = {
     server(api).startHttpServer()
   }

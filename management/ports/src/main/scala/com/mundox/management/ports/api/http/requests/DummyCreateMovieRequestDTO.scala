@@ -13,6 +13,10 @@ import scala.concurrent.Future
 case class DummyCreateMovieRequestDTO(title: String)
 
 object DummyCreateMovieRequestDTO {
+
+  def toDomain(dto: DummyCreateMovieRequestDTO): DummyMovie =
+    DummyMovie(UUID.randomUUID().toString, dto.title)
+
   def validate(input: DummyCreateMovieRequestDTO): Either[ManagementException, DummyCreateMovieRequestDTO] =
     (for {
       _ <- Validator.validateSpecialCharactersWithSpaces("title", input.title)
