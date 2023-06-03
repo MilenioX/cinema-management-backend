@@ -1,14 +1,25 @@
 package com.mundox.management.ports
 
+import com.mundox.management.core.commands.DummyMoviesCommand
+import com.mundox.management.core.queries.DummyMoviesQuery
+import com.mundox.management.core.services.DummyMoviesService
 import com.mundox.management.ports.api.http.{HttpServer, ManagementAPI}
 
-object Environment {
+trait Environment {
 
-  val apiRoutes: ManagementAPI = new ManagementAPI
-  val server = new HttpServer(apiRoutes)
+  def server(api:ManagementAPI) = new HttpServer(api)
 
-  def startEnvironment(): Unit = {
-    server.startHttpServer()
+  // Services
+  val dummyMoviesService: DummyMoviesService
+
+  // Queries
+  lazy val dummyMoviesQuery: DummyMoviesQuery = new DummyMoviesQuery(dummyMoviesService)
+
+  // Commands
+  lazy val dummyMoviesCommand: DummyMoviesCommand = new DummyMoviesCommand(dummyMoviesService)
+
+  def startEnvironment(api: ManagementAPI): Unit = {
+    server(api).startHttpServer()
   }
 
 }

@@ -2,8 +2,9 @@ package com.mundox.management.ports.validations.validators
 
 import cats.data.Chain
 import cats.data.Validated.{Invalid, Valid}
+import com.mundox.management.core.validations.data.{MaxLength, MinLength, ValueHasSpecialCharacters}
+import com.mundox.management.core.validations.validators.ValidatorNec
 import com.mundox.management.ports.TestSpec
-import com.mundox.management.ports.validations.data.{MaxLength, MinLength, ValueHasSpecialCharacters}
 
 class ValidatorNecTest extends TestSpec {
 

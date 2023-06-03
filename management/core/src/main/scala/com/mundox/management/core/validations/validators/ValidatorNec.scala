@@ -1,8 +1,8 @@
-package com.mundox.management.ports.validations.validators
+package com.mundox.management.core.validations.validators
 
+import com.mundox.management.core.validations.data.{MaxLength, MinLength, Validation, ValueHasSpecialCharacters}
 import cats.data.ValidatedNec
 import cats.implicits._
-import com.mundox.management.ports.validations.data.{MaxLength, MinLength, Validation, ValueHasSpecialCharacters}
 
 trait ValidatorNec {
 

@@ -1,7 +1,8 @@
 package com.mundox.management.ports.validations.validators
 
+import com.mundox.management.core.validations.data.{MaxLength, MinLength, ValueHasSpecialCharacters}
+import com.mundox.management.core.validations.validators.Validator
 import com.mundox.management.ports.TestSpec
-import com.mundox.management.ports.validations.data.{MaxLength, MinLength, ValueHasSpecialCharacters}
 
 class ValidatorTest extends TestSpec {
 
