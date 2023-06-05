@@ -20,7 +20,7 @@ class DummyMoviesCommand(service: DummyMoviesService) extends Logger {
     service.updateMovie(id, updatedMovie)
   }
 
-  def deleteMovie(id: String): Future[Either[ManagementException,Option[DummyMovie]]] = {
+  def deleteMovie(id: String): EitherT[Future, ManagementException,Option[DummyMovie]] = {
     loggerInfo("deleteMovie service in command was invoked.")
     service.deleteMovie(id)
   }

@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
 class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends Logger with JsonSupport {
 
   def getRoutes: Route =
-    getMovies ~ addMovie() ~ updateMovie()
+    getMovies ~ addMovie() ~ updateMovie() ~ deleteMovie()
 
   private def getMovies: Route =
     path("movies") {
@@ -98,4 +98,31 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
         }
       }
     }
+
+  private def deleteMovie(): Route = {
+    path("movies" / Segment) { id =>
+      delete {
+        loggerInfo(s"deleteMovie service was invoked")
+        val result = for {
+          res <- command.deleteMovie(id)
+        } yield res
+
+        onComplete(result.value) {
+          case Success(either) =>
+            either match {
+              case Left(err) =>
+                loggerError(s"deleteMovie has an error: $err")
+                complete(StatusCodes.BadRequest, err.errorMsg)
+              case Right(value) =>
+                loggerInfo("success response in deleteMovie service")
+                complete(StatusCodes.OK, value.map(DummyMovieResponseDTO(_)))
+            }
+          case Failure(err) =>
+            loggerError(s"deleteMovie service has an error: $err")
+            complete(StatusCodes.InternalServerError, err.getMessage)
+        }
+
+      }
+    }
+  }
 }
