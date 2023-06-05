@@ -4,7 +4,7 @@ import cats.data.EitherT
 import com.mundox.management.core.domain.DummyMovie
 import com.mundox.management.core.exceptions.ManagementException
 import com.mundox.management.core.services.DummyMoviesService
-import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.{any, anyString}
 import org.mockito.Mockito.when
 import org.scalatestplus.mockito.MockitoSugar.mock
 
@@ -19,6 +19,11 @@ class TestEnvironment extends Environment {
   when(serviceMock.addMovie(any())).thenReturn {
     EitherT[Future, ManagementException, Option[DummyMovie]] {
       Future.successful {Right(Option(DummyMovie("912", "Testing Movie")))}
+    }
+  }
+  when(serviceMock.updateMovie(anyString(), any())).thenReturn {
+    EitherT[Future, ManagementException, Option[DummyMovie]] {
+      Future.successful {Right(Option(DummyMovie("123", "Movie updated")))}
     }
   }
 

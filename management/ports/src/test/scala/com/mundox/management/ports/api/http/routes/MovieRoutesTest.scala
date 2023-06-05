@@ -27,11 +27,30 @@ class MovieRoutesTest extends TestSpec with JsonSupport {
       status shouldEqual OK
       header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
       responseAs[DummyMovieResponseDTO].title shouldEqual "Testing Movie"
+      println(responseAs[DummyMovieResponseDTO].id)
+      responseAs[DummyMovieResponseDTO].id shouldEqual "912"
     }
   }
 
   "The movies post service" should "return a list of error in the title movie value" in {
     Post("/management/movies").withEntity(ContentTypes.`application/json`, "{\"title\":\"This is an *&example of error validation for the input user received in the backEnd services\"}") ~> apiRoutes.routes ~> check {
+      status shouldEqual BadRequest
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[String] shouldEqual "title must not contain special characters.,title has more than maximum characters allowed."
+    }
+  }
+
+  "The movies put service" should "return the movie updated" in {
+    Put("/management/movies/123").withEntity(ContentTypes.`application/json`, "{\"title\":\"Movie updated\"}") ~> apiRoutes.routes ~> check {
+      status shouldEqual OK
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[DummyMovieResponseDTO].title shouldEqual "Movie updated"
+      responseAs[DummyMovieResponseDTO].id shouldEqual "123"
+    }
+  }
+
+  "The movies put service" should "return a list of error in the title movie value" in {
+    Put("/management/movies/123").withEntity(ContentTypes.`application/json`, "{\"title\":\"This is an *&example of error validation for the input user received in the backEnd services\"}") ~> apiRoutes.routes ~> check {
       status shouldEqual BadRequest
       header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
       responseAs[String] shouldEqual "title must not contain special characters.,title has more than maximum characters allowed."
