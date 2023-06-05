@@ -55,16 +55,18 @@ class DummyMoviesAdapter extends DummyMoviesService with Logger {
     }
   }
 
-  override def updateMovie(id: String, updatedMovie: DummyMovie): Future[Either[ManagementException, Option[DummyMovie]]] = {
+  override def updateMovie(id: String, updatedMovie: DummyMovie): EitherT[Future, ManagementException, Option[DummyMovie]] = {
     loggerInfo("updateMovie service in adapter was invoked.")
-    Await.ready(Future {
-      try {
-        moviesList = moviesList.map(value => if (value.id.equals(id)) updatedMovie else value)
-        Right(Option(updatedMovie))
-      } catch {
-        case e: Exception => Left(AdapterError(e.getMessage))
-      }
-    }, 5.seconds)
+    EitherT {
+      Await.ready(Future {
+        try {
+          moviesList = moviesList.map(value => if (value.id.equals(id)) updatedMovie else value)
+          Right(Option(updatedMovie))
+        } catch {
+          case e: Exception => Left(AdapterError(e.getMessage))
+        }
+      }, 5.seconds)
+    }
   }
 
   override def deleteMovie(id: String): Future[Either[ManagementException, Option[DummyMovie]]] = {

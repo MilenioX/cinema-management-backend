@@ -11,16 +11,13 @@ import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO.toDomain
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
-import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends Logger with JsonSupport {
 
   def getRoutes: Route =
-    getMovies ~ addMovie()
+    getMovies ~ addMovie() ~ updateMovie()
 
   private def getMovies: Route =
     path("movies") {
@@ -53,7 +50,7 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
           val result =
             for {
               validation <- DummyCreateMovieRequestDTO.validateNec(movie)
-              res <- command.addMovie(toDomain(validation))
+              res <- command.addMovie(toDomain(validation, None))
             } yield res
 
           onComplete(result.value) {
@@ -69,6 +66,34 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
             case Failure(ex) =>
               loggerError(s"addMovie service has an error: $ex")
               complete(StatusCodes.InternalServerError, ex.getMessage)
+          }
+        }
+      }
+    }
+
+  private def updateMovie(): Route =
+    path("movies" / Segment) { id =>
+      put {
+        entity(as[DummyCreateMovieRequestDTO]) { dto =>
+          loggerInfo("updateMovie service invoked")
+          val result = for {
+            validation <- DummyCreateMovieRequestDTO.validateNec(dto)
+            res <- command.updateMovie(id, toDomain(validation, Some(id)))
+          } yield res
+
+          onComplete(result.value) {
+            case Success(eit) =>
+              eit match {
+                case Left(err) =>
+                  loggerError(s"updateMovie service has an error: $err")
+                  complete(StatusCodes.BadRequest, err.errorMsg)
+                case Right(value) =>
+                  loggerInfo("success response in updateMovie service")
+                  complete(StatusCodes.OK, value.map(DummyMovieResponseDTO(_)))
+              }
+            case Failure(err) =>
+              loggerError(s"updateMovie service has an error: $err")
+              complete(StatusCodes.InternalServerError, err.getMessage)
           }
         }
       }

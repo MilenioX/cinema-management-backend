@@ -15,7 +15,7 @@ class DummyMoviesCommand(service: DummyMoviesService) extends Logger {
     service.addMovie(newMovie)
   }
 
-  def updateMovie(id: String, updatedMovie: DummyMovie):Future[Either[ManagementException,Option[DummyMovie]]] = {
+  def updateMovie(id: String, updatedMovie: DummyMovie):EitherT[Future, ManagementException,Option[DummyMovie]] = {
     loggerInfo("updateMovie service in command was invoked.")
     service.updateMovie(id, updatedMovie)
   }
