@@ -26,6 +26,11 @@ class TestEnvironment extends Environment {
       Future.successful {Right(Option(DummyMovie("123", "Movie updated")))}
     }
   }
+  when(serviceMock.deleteMovie(anyString())).thenReturn {
+    EitherT[Future, ManagementException, Option[DummyMovie]] {
+      Future.successful {Right(Option(DummyMovie("123", "Movie updated")))}
+    }
+  }
 
   override val dummyMoviesService: DummyMoviesService = serviceMock
 }

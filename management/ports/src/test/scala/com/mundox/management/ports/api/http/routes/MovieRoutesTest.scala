@@ -56,6 +56,15 @@ class MovieRoutesTest extends TestSpec with JsonSupport {
       responseAs[String] shouldEqual "title must not contain special characters.,title has more than maximum characters allowed."
     }
   }
+
+  "The movies delete service" should "return the movie deleted" in {
+    Delete("/management/movies/123") ~> apiRoutes.routes ~> check {
+      status shouldEqual OK
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[DummyMovieResponseDTO].title shouldEqual "Movie updated"
+      responseAs[DummyMovieResponseDTO].id shouldEqual "123"
+    }
+  }
 }
 
 
