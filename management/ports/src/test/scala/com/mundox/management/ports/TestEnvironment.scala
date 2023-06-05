@@ -16,6 +16,11 @@ class TestEnvironment extends Environment {
   when(serviceMock.getMovies).thenReturn {
     Future.successful {Right(List(DummyMovie("123", "Movie 1"),DummyMovie("321", "Movie 2")))}
   }
+  when(serviceMock.getMovieById(any())).thenReturn {
+    Future.successful {
+      Right(Option(DummyMovie("123", "Movie 1")))
+    }
+  }
   when(serviceMock.addMovie(any())).thenReturn {
     EitherT[Future, ManagementException, Option[DummyMovie]] {
       Future.successful {Right(Option(DummyMovie("912", "Testing Movie")))}

@@ -14,11 +14,19 @@ class MovieRoutesTest extends TestSpec with JsonSupport {
 
   val movieReq: DummyCreateMovieRequestDTO = DummyCreateMovieRequestDTO("Testing Movie")
 
-  "The movies get service" should "return a list of movies" in {
+  "The get movies service" should "return a list of movies" in {
     Get("/management/movies") ~> apiRoutes.routes ~> check {
       status shouldEqual OK
       header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
       responseAs[List[DummyMovieResponseDTO]] shouldEqual List(DummyMovieResponseDTO("123", "Movie 1"), DummyMovieResponseDTO("321", "Movie 2"))
+    }
+  }
+
+  "The get movies by id service" should "return a movie" in {
+    Get("/management/movies/123") ~> apiRoutes.routes ~> check {
+      status shouldEqual OK
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[DummyMovieResponseDTO] shouldEqual DummyMovieResponseDTO("123", "Movie 1")
     }
   }
 
