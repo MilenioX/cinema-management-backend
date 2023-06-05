@@ -11,16 +11,13 @@ import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO
 import com.mundox.management.ports.api.http.requests.DummyCreateMovieRequestDTO.toDomain
 import com.mundox.management.ports.api.http.responses.DummyMovieResponseDTO
 
-import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success}
 
 class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends Logger with JsonSupport {
 
   def getRoutes: Route =
-    getMovies ~ addMovie()
+    getMovies ~ getMovieById ~ addMovie() ~ updateMovie() ~ deleteMovie()
 
   private def getMovies: Route =
     path("movies") {
@@ -45,6 +42,31 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
       }
     }
 
+  private def getMovieById: Route =
+    path("movies" / Segment) { id =>
+      get {
+        loggerInfo("getMoviesById service was invoked")
+        val result = for {
+          res <- query.getMoviesById(id)
+        } yield res
+
+        onComplete(result) {
+          case Success(either) =>
+            either match {
+              case Left(err) =>
+                loggerError("getMovieById has an error $err")
+                complete(StatusCodes.BadRequest, err.errorMsg)
+              case Right(value) =>
+                loggerInfo("success response in getMovieById service")
+                complete(StatusCodes.OK, value.map(DummyMovieResponseDTO(_)))
+            }
+          case Failure(err) =>
+            loggerError("getMoviesById has an error $err")
+            complete(StatusCodes.InternalServerError, err.getMessage)
+        }
+      }
+    }
+
   private def addMovie(): Route =
     path("movies") {
       post {
@@ -53,7 +75,7 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
           val result =
             for {
               validation <- DummyCreateMovieRequestDTO.validateNec(movie)
-              res <- command.addMovie(toDomain(validation))
+              res <- command.addMovie(toDomain(validation, None))
             } yield res
 
           onComplete(result.value) {
@@ -73,4 +95,59 @@ class MovieRoutes(query: DummyMoviesQuery, command: DummyMoviesCommand) extends 
         }
       }
     }
+
+  private def updateMovie(): Route =
+    path("movies" / Segment) { id =>
+      put {
+        entity(as[DummyCreateMovieRequestDTO]) { dto =>
+          loggerInfo("updateMovie service invoked")
+          val result = for {
+            validation <- DummyCreateMovieRequestDTO.validateNec(dto)
+            res <- command.updateMovie(id, toDomain(validation, Some(id)))
+          } yield res
+
+          onComplete(result.value) {
+            case Success(eit) =>
+              eit match {
+                case Left(err) =>
+                  loggerError(s"updateMovie service has an error: $err")
+                  complete(StatusCodes.BadRequest, err.errorMsg)
+                case Right(value) =>
+                  loggerInfo("success response in updateMovie service")
+                  complete(StatusCodes.OK, value.map(DummyMovieResponseDTO(_)))
+              }
+            case Failure(err) =>
+              loggerError(s"updateMovie service has an error: $err")
+              complete(StatusCodes.InternalServerError, err.getMessage)
+          }
+        }
+      }
+    }
+
+  private def deleteMovie(): Route = {
+    path("movies" / Segment) { id =>
+      delete {
+        loggerInfo(s"deleteMovie service was invoked")
+        val result = for {
+          res <- command.deleteMovie(id)
+        } yield res
+
+        onComplete(result.value) {
+          case Success(either) =>
+            either match {
+              case Left(err) =>
+                loggerError(s"deleteMovie has an error: $err")
+                complete(StatusCodes.BadRequest, err.errorMsg)
+              case Right(value) =>
+                loggerInfo("success response in deleteMovie service")
+                complete(StatusCodes.OK, value.map(DummyMovieResponseDTO(_)))
+            }
+          case Failure(err) =>
+            loggerError(s"deleteMovie service has an error: $err")
+            complete(StatusCodes.InternalServerError, err.getMessage)
+        }
+
+      }
+    }
+  }
 }

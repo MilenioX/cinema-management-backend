@@ -55,28 +55,32 @@ class DummyMoviesAdapter extends DummyMoviesService with Logger {
     }
   }
 
-  override def updateMovie(id: String, updatedMovie: DummyMovie): Future[Either[ManagementException, Option[DummyMovie]]] = {
+  override def updateMovie(id: String, updatedMovie: DummyMovie): EitherT[Future, ManagementException, Option[DummyMovie]] = {
     loggerInfo("updateMovie service in adapter was invoked.")
-    Await.ready(Future {
-      try {
-        moviesList = moviesList.map(value => if (value.id.equals(id)) updatedMovie else value)
-        Right(Option(updatedMovie))
-      } catch {
-        case e: Exception => Left(AdapterError(e.getMessage))
-      }
-    }, 5.seconds)
+    EitherT {
+      Await.ready(Future {
+        try {
+          moviesList = moviesList.map(value => if (value.id.equals(id)) updatedMovie else value)
+          Right(Option(updatedMovie))
+        } catch {
+          case e: Exception => Left(AdapterError(e.getMessage))
+        }
+      }, 5.seconds)
+    }
   }
 
-  override def deleteMovie(id: String): Future[Either[ManagementException, Option[DummyMovie]]] = {
+  override def deleteMovie(id: String): EitherT[Future, ManagementException, Option[DummyMovie]] = {
     loggerInfo("deleteMovie service in adapter was invoked.")
-    Await.ready(Future {
-      try {
-        val deletedElement = moviesList.find(_.id.equals(id))
-        moviesList = moviesList.filter(!_.id.equals(id))
-        Right(deletedElement)
-      } catch {
-        case e: Exception => Left(AdapterError(e.getMessage))
-      }
-    }, 5.seconds)
+    EitherT {
+      Await.ready(Future {
+        try {
+          val deletedElement = moviesList.find(_.id.equals(id))
+          moviesList = moviesList.filter(!_.id.equals(id))
+          Right(deletedElement)
+        } catch {
+          case e: Exception => Left(AdapterError(e.getMessage))
+        }
+      }, 5.seconds)
+    }
   }
 }
