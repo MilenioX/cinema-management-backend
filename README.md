@@ -8,9 +8,14 @@ There are actions related to maintenance and those happen when the auditoriums o
 
 - SBT 1.8.1
 - Scala 2.13.10
-- Scala Test 3.2.15
+- Scala Test 3.2.16
+- Mockito 3.2.15.0
+- Log4J 2.19.0
+
+### Management Project
 - Akka HTTP 10.5.1
-- Circe 0.14.1
+- Cats 2.9.0
+- SprayJson 10.5.1
 
 ## Endpoints
 All endpoints are under the `/api/v1` context, and it has a subcontext according to the subdomain:
