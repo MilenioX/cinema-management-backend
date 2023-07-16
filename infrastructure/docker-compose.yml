@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres:15.2
+    restart: unless-stopped
+    container_name: management_cinema_db
+    ports:
+      - "4001:5432"
+    volumes:
+      - /tmp/sql/volume/management_cinema:/var/lib/postgresql/data
+      - ./database/sql/init-scripts/:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=management
+      - POSTGRES_DB=management
