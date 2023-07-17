@@ -5,6 +5,7 @@ import com.mundox.management.core.services.{DummyMoviesService, SnacksService}
 import com.mundox.management.ports.adapters.database.SnackRepository
 import com.mundox.management.ports.adapters.{DummyMoviesAdapter, SnacksAdapter}
 import com.mundox.management.ports.api.http.ManagementAPI
+import com.mundox.management.ports.config.Environment
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global

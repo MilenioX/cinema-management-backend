@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.headers.`Content-Type`
 import com.mundox.management.ports.api.http.routes.{MovieRoutes, SnackRoutes}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.mundox.management.ports.Environment
+import com.mundox.management.ports.config.Environment
 
 import scala.concurrent.ExecutionContext
 

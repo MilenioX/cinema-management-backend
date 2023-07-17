@@ -1,4 +1,4 @@
-package com.mundox.management.ports
+package com.mundox.management.ports.config
 
 import com.mundox.management.core.commands.DummyMoviesCommand
 import com.mundox.management.core.queries.{DummyMoviesQuery, SnacksQuery}
