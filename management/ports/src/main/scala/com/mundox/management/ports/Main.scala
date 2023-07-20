@@ -6,6 +6,7 @@ import com.mundox.management.ports.adapters.database.SnackRepository
 import com.mundox.management.ports.adapters.{DummyMoviesAdapter, SnacksAdapter}
 import com.mundox.management.ports.api.http.ManagementAPI
 import com.mundox.management.ports.config.Environment
+import com.mundox.management.ports.config.properties.Configuration
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,10 +20,15 @@ object Main extends Logger {
 
   def main(args: Array[String]): Unit = {
     loggerInfo("Management service starting...");
-    val env = createEnvironment
 
-    val api: ManagementAPI = new ManagementAPI(env)
+    Configuration.loadConfiguration.fold{
+      loggerError("Configuration file could not be loaded.")
+    }{config =>
+      val env = createEnvironment
 
-    env.startEnvironment(api)
+      val api: ManagementAPI = new ManagementAPI(env)
+
+      env.startEnvironment(api, config)
+    }
   }
 }

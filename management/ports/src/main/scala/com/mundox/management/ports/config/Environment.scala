@@ -4,12 +4,13 @@ import com.mundox.management.core.commands.DummyMoviesCommand
 import com.mundox.management.core.queries.{DummyMoviesQuery, SnacksQuery}
 import com.mundox.management.core.services.{DummyMoviesService, SnacksService}
 import com.mundox.management.ports.api.http.{HttpServer, ManagementAPI}
+import com.mundox.management.ports.config.properties.{Configuration, Server}
 
 import scala.concurrent.Future
 
 trait Environment {
 
-  def server(api:ManagementAPI) = new HttpServer(api)
+  def server(api:ManagementAPI, serverConf: Server) = new HttpServer(api, serverConf)
 
   // Services
   val dummyMoviesService: DummyMoviesService
@@ -22,8 +23,8 @@ trait Environment {
   // Commands
   lazy val dummyMoviesCommand: DummyMoviesCommand = new DummyMoviesCommand(dummyMoviesService)
 
-  def startEnvironment(api: ManagementAPI): Unit = {
-    server(api).startHttpServer()
+  def startEnvironment(api: ManagementAPI, config: Configuration): Unit = {
+    server(api, config.server).startHttpServer()
   }
 
 }
