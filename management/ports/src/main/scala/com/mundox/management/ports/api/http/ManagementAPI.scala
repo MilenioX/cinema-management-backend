@@ -7,9 +7,8 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.mundox.management.ports.config.Environment
 
-import scala.concurrent.ExecutionContext
 
-class ManagementAPI(environment: Environment)(implicit ec: ExecutionContext) {
+class ManagementAPI(environment: Environment) {
 
   private val movieRoutes = new MovieRoutes(environment.dummyMoviesQuery, environment.dummyMoviesCommand)
   private val snackRoutes = new SnackRoutes(environment.snacksQuery)

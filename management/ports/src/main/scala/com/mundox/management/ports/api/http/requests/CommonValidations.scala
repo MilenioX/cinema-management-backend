@@ -4,13 +4,12 @@ import cats.implicits._
 import cats.data.Validated
 import com.mundox.management.core.exceptions.{ManagementException, ValidationError}
 import com.mundox.management.core.validations.data.ValueIsNotValid
-
-import scala.concurrent.{ExecutionContext, Future}
+import monix.eval.Task
 
 object CommonValidations {
 
-  def validateId(id: Int)(implicit ec: ExecutionContext): Future[Either[ManagementException, Int]] =
-    Future {
+  def validateId(id: Int): Task[Either[ManagementException, Int]] =
+    Task {
       Validated.condNec(id > 0, id, ValueIsNotValid("Error with the id"))
         .toEither
         .leftMap(v => ValidationError(v.toList))

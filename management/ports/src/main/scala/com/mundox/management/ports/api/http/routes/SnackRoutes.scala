@@ -8,13 +8,15 @@ import akka.http.scaladsl.server.Directives._
 import com.mundox.management.core.queries.SnacksQuery
 import com.mundox.management.ports.api.http.requests.CommonValidations
 import com.mundox.management.ports.api.http.responses.SnackDTO
+import monix.eval.Task
+import monix.execution.Scheduler.Implicits.global
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-class SnackRoutes(query: SnacksQuery[Future])(implicit ec: ExecutionContext) extends Logger with JsonSupport {
+class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
 
-  def getRoutes = pathPrefix("snacks") {
+  def getRoutes: Route = pathPrefix("snacks") {
     getSnackById ~ getAllSnacks
   }
 
@@ -25,10 +27,13 @@ class SnackRoutes(query: SnacksQuery[Future])(implicit ec: ExecutionContext) ext
         snacks <- query.getSnacks
       } yield snacks
 
-      onComplete(result) {
+      onComplete(result.runToFuture) {
         case Success(snacks) =>
           loggerInfo(s"Success response in getAllSnacks service")
           complete(StatusCodes.OK -> snacks.map(SnackDTO(_)))
+        case Failure(exception) =>
+          loggerInfo(s"There was an error getting the records $exception")
+          complete(StatusCodes.InternalServerError)
       }
     }
 
@@ -41,7 +46,7 @@ class SnackRoutes(query: SnacksQuery[Future])(implicit ec: ExecutionContext) ext
           snack <- query.getSnackById(id)
         } yield snack
 
-        onComplete(result) {
+        onComplete(result.runToFuture) {
           case Success(value) =>
             value match {
               case Some(snack) =>

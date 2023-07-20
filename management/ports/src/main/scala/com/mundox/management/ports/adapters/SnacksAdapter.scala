@@ -1,17 +1,19 @@
 package com.mundox.management.ports.adapters
 
-import com.mundox.management.core.domain.snacks.Snack
+import com.mundox.management.core.domain.snacks.{Snack, SnackType}
+import com.mundox.management.core.env.log.Logger
 import com.mundox.management.core.services.SnacksService
 import com.mundox.management.core.services.data.Repository
+import com.mundox.management.ports.adapters.database.dtos.SnackDTO
+import monix.eval.Task
 
-import scala.concurrent.Future
+class SnacksAdapter(repository: Repository[Task, SnackDTO, Int]) extends SnacksService[Task] with Logger {
 
-class SnacksAdapter(repository: Repository[Future, Snack, Int]) extends SnacksService[Future] {
-
-  override def getSnacks: Future[List[Snack]] = {
-    repository.fetchAll
+  override def getSnacks: Task[List[Snack]] = {
+    loggerInfo(s"Get Snacks service called")
+    repository.fetchAll.map(_.map(s => Snack(s.id, s.name, SnackType.Sweet, s.quantity, s.price)))
   }
 
-  override def getSnacksById(id: Int): Future[Option[Snack]] =
-    repository.fetchOne(id)
+  override def getSnacksById(id: Int): Task[Option[Snack]] =
+    repository.fetchOne(id).map(_.map(s => Snack(s.id, s.name, SnackType.Sweet, s.quantity, s.price)))
 }

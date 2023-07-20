@@ -1,21 +1,22 @@
 package com.mundox.management.ports
 
 import com.mundox.management.core.env.log.Logger
+import com.mundox.management.core.services.data.Repository
 import com.mundox.management.core.services.{DummyMoviesService, SnacksService}
 import com.mundox.management.ports.adapters.database.SnackRepository
+import com.mundox.management.ports.adapters.database.dtos.SnackDTO
 import com.mundox.management.ports.adapters.{DummyMoviesAdapter, SnacksAdapter}
 import com.mundox.management.ports.api.http.ManagementAPI
 import com.mundox.management.ports.config.Environment
 import com.mundox.management.ports.config.properties.Configuration
+import monix.eval.Task
 
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 object Main extends Logger {
 
 
-  private def createEnvironment: Environment = new Environment {
+  private def createEnvironment(config: Configuration): Environment = new Environment {
     override val dummyMoviesService: DummyMoviesService = new DummyMoviesAdapter
-    override val snacksService: SnacksService[Future] = new SnacksAdapter(new SnackRepository())
+    override val snacksService: SnacksService[Task] = new SnacksAdapter(new SnackRepository(config.database))
   }
 
   def main(args: Array[String]): Unit = {
@@ -24,7 +25,7 @@ object Main extends Logger {
     Configuration.loadConfiguration.fold{
       loggerError("Configuration file could not be loaded.")
     }{config =>
-      val env = createEnvironment
+      val env = createEnvironment(config)
 
       val api: ManagementAPI = new ManagementAPI(env)
 
