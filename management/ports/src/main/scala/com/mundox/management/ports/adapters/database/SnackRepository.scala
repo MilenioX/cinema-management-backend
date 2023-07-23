@@ -21,13 +21,17 @@ class SnackRepository(config: Database) extends Repository[Task, SnackDTO, Int] 
   override def fetchAll: Task[List[SnackDTO]] = {
     Fragment.const(SnacksDAO.getAllElements)
         .query[SnackDTO]
-        .to[List]
+        .stream.compile.toList
         .transact(getTransactor(config))
   }
 
-  override def fetchOne(id: Int): Task[Option[SnackDTO]] = Task.pure {
-    snacks.find(_.id == id)
-  }
+  override def fetchOne(id: Int): Task[Option[SnackDTO]] =
+    Fragment.const(SnacksDAO.getSnacksById(id.toString))
+      .query[SnackDTO]
+      .stream.take(1)
+      .compile
+      .last
+      .transact(getTransactor(config))
 
   override def insert(snack: SnackDTO): Task[Option[SnackDTO]] = Task.pure {
     snacks = snack +: snacks
