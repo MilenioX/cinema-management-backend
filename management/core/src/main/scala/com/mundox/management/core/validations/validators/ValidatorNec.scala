@@ -1,6 +1,6 @@
 package com.mundox.management.core.validations.validators
 
-import com.mundox.management.core.validations.data.{MaxLength, MinLength, Validation, ValueHasSpecialCharacters}
+import com.mundox.management.core.validations.data.{MaxLength, MinLength, Validation, ValueHasSpecialCharacters, ValueIsNotValid}
 import cats.data.ValidatedNec
 import cats.implicits._
 
@@ -27,6 +27,20 @@ trait ValidatorNec {
       value.validNec[Validation]
     else
       MaxLength(field).invalidNec[String]
+
+  def validateIsNumber(field: String, value: String): ValidationResult[Int] =
+    try {
+      value.toInt.validNec[Validation]
+    } catch {
+      case _: NumberFormatException =>
+        ValueIsNotValid(field).invalidNec[Int]
+    }
+
+  def validateNumberGreaterThanZero(field: String, value: Int): ValidationResult[Int] =
+    if (value > 0)
+      value.validNec[Validation]
+    else
+      ValueIsNotValid(field).invalidNec[Int]
 }
 
 object ValidatorNec extends ValidatorNec
