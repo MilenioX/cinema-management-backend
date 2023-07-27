@@ -25,10 +25,16 @@ class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
           snacks <- query.getSnacks
         } yield snacks
 
-        onComplete(result.runToFuture) {
-          case Success(snacks) =>
-            loggerInfo(s"Success response in getAllSnacks service")
-            complete(StatusCodes.OK -> snacks.map(SnackResponseDTO(_)))
+        onComplete(result.value.runToFuture) {
+          case Success(eitherResp) =>
+            eitherResp match {
+              case Left(err) =>
+                loggerInfo(s"There was an error getting the records $err")
+                complete(StatusCodes.InternalServerError)
+              case Right(snacks) =>
+                loggerInfo(s"Success response in getAllSnacks service")
+                complete(StatusCodes.OK -> snacks.map(SnackResponseDTO(_)))
+            }
           case Failure(exception) =>
             loggerInfo(s"There was an error getting the records $exception")
             complete(StatusCodes.InternalServerError)

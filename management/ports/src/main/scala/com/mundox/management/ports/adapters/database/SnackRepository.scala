@@ -1,5 +1,6 @@
 package com.mundox.management.ports.adapters.database
 
+import cats.data.EitherT
 import com.mundox.management.core.services.data.Repository
 import com.mundox.management.ports.adapters.database.daos.SnacksDAO
 import com.mundox.management.ports.adapters.database.dtos.SnackDTO
@@ -18,12 +19,13 @@ class SnackRepository(config: Database) extends Repository[Task, SnackDTO, Int] 
     SnackDTO(4, "Coca Cola", "SnackType.Drinks", 200, 4.30),
   )
 
-  override def fetchAll: Task[List[SnackDTO]] = {
+  override def fetchAll: EitherT[Task, String, List[SnackDTO]] = EitherT {
     Fragment.const(SnacksDAO.getAllElements)
         .query[SnackDTO]
         .stream.compile.toList
         .transact(getTransactor(config))
-  }
+        .attempt
+  }.leftMap(t => t.getMessage)
 
   override def fetchOne(id: Int): Task[Option[SnackDTO]] =
     Fragment.const(SnacksDAO.getSnacksById(id.toString))

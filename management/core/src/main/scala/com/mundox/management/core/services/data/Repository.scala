@@ -1,8 +1,10 @@
 package com.mundox.management.core.services.data
 
+import cats.data.EitherT
+
 trait Repository[F[_], A, B] extends DataSource {
 
-  def fetchAll: F[List[A]]
+  def fetchAll: EitherT[F, String, List[A]]
 
   def fetchOne(id: B): F[Option[A]]
 
