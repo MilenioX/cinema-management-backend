@@ -7,7 +7,7 @@ import com.mundox.management.ports.api.http.JsonSupport
 import akka.http.scaladsl.server.Directives._
 import com.mundox.management.core.queries.SnacksQuery
 import com.mundox.management.ports.api.http.requests.CommonValidations
-import com.mundox.management.ports.api.http.responses.SnackDTO
+import com.mundox.management.ports.api.http.responses.SnackResponseDTO
 import monix.eval.Task
 import monix.execution.Scheduler.Implicits.global
 
@@ -28,7 +28,7 @@ class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
         onComplete(result.runToFuture) {
           case Success(snacks) =>
             loggerInfo(s"Success response in getAllSnacks service")
-            complete(StatusCodes.OK -> snacks.map(SnackDTO(_)))
+            complete(StatusCodes.OK -> snacks.map(SnackResponseDTO(_)))
           case Failure(exception) =>
             loggerInfo(s"There was an error getting the records $exception")
             complete(StatusCodes.InternalServerError)
@@ -50,7 +50,7 @@ class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
               value match {
                 case Some(snack) =>
                   loggerInfo(s"Success response in getAllSnacksById service")
-                  complete(StatusCodes.OK -> SnackDTO(snack))
+                  complete(StatusCodes.OK -> SnackResponseDTO(snack))
                 case None =>
                   loggerInfo(s"Empty response in getAllSnacksById service")
                   complete(StatusCodes.NotFound)
