@@ -2,12 +2,11 @@ import sbt.*
 
 object Dependencies {
 
-
   lazy val scalaTestVersion = "3.2.16"
   lazy val mockitoVersion = "3.2.15.0"
   lazy val scalaLog4jVersion = "12.0"
   lazy val log4jVersion = "2.19.0"
-  lazy val catsVersion = "2.9.0"
+  lazy val catsVersion = "2.6.1"
   lazy val monixVersion = "3.4.0"
   lazy val akkaVersion = "2.7.0"
   lazy val akkaHttpVersion = "10.5.1"
@@ -34,8 +33,8 @@ object Dependencies {
 
   lazy val doobieCodeDep = "org.tpolecat" %% "doobie-core" % doobieVersion
   lazy val doobiePostgreSQL = "org.tpolecat" %% "doobie-postgres" % doobieVersion
-  lazy val doobieSpecs2 = "org.tpolecat" %% "doobie-specs2" % "1.0.0-RC1" % "test"
-  lazy val doobieScalaTest = "org.tpolecat" %% "doobie-scalatest" % "1.0.0-RC1" % "test"
+  lazy val doobieSpecs2 = "org.tpolecat" %% "doobie-specs2" % doobieVersion % "test"
+  lazy val doobieScalaTest = "org.tpolecat" %% "doobie-scalatest" % doobieVersion % "test"
 
   lazy val portsDependencies: Seq[ModuleID] = Seq(
     pureConfig,
@@ -43,7 +42,7 @@ object Dependencies {
     akkaActorTyped, akkaStream, akkaHttp,
     akkaStreamTest, akkaHttpTest,
     sprayJsonAkka,
-    doobieCodeDep, doobiePostgreSQL, doobieSpecs2, doobieSpecs2,
+    doobieCodeDep, doobiePostgreSQL, doobieSpecs2, doobieScalaTest,
   )
 
   lazy val commonDependencies: Seq[ModuleID] = Seq(
