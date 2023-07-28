@@ -27,13 +27,15 @@ class SnackRepository(config: Database) extends Repository[Task, SnackDTO, Int] 
         .attempt
   }.leftMap(t => t.getMessage)
 
-  override def fetchOne(id: Int): Task[Option[SnackDTO]] =
+  override def fetchOne(id: Int): EitherT[Task, String, Option[SnackDTO]] = EitherT {
     Fragment.const(SnacksDAO.getSnacksById(id.toString))
       .query[SnackDTO]
       .stream.take(1)
       .compile
       .last
       .transact(getTransactor(config))
+      .attempt
+  }.leftMap(t => t.getMessage)
 
   override def insert(snack: SnackDTO): Task[Option[SnackDTO]] = Task.pure {
     snacks = snack +: snacks

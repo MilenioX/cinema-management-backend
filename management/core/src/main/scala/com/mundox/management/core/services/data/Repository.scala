@@ -6,7 +6,7 @@ trait Repository[F[_], A, B] extends DataSource {
 
   def fetchAll: EitherT[F, String, List[A]]
 
-  def fetchOne(id: B): F[Option[A]]
+  def fetchOne(id: B): EitherT[F, String, Option[A]]
 
   def insert(a: A): F[Option[A]]
 

@@ -7,5 +7,5 @@ trait SnacksService[F[_]] {
 
   def getSnacks: EitherT[F, String, List[Snack]]
 
-  def getSnacksById(id: Int): F[Option[Snack]]
+  def getSnacksById(id: Int): EitherT[F, String, Option[Snack]]
 }

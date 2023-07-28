@@ -15,6 +15,6 @@ class SnacksAdapter(repository: Repository[Task, SnackDTO, Int]) extends SnacksS
     repository.fetchAll.map(_.map(s => Snack(s.id, s.name, SnackType.Sweet, s.quantity, s.price)))
   }
 
-  override def getSnacksById(id: Int): Task[Option[Snack]] =
+  override def getSnacksById(id: Int): EitherT[Task, String, Option[Snack]] =
     repository.fetchOne(id).map(_.map(s => Snack(s.id, s.name, SnackType.Sweet, s.quantity, s.price)))
 }
