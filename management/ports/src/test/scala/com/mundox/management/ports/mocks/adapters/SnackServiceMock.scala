@@ -14,7 +14,7 @@ class SnackServiceMock extends SnacksService[Task] {
       "Error retrieving the snacks information"
     )
 
-  override def getSnacksById(id: Int): Task[Option[Snack]] = Task {
-    Option(Snack(123, "Chocolate", SnackType.Sweet, 1, 10.20))
+  override def getSnacksById(id: Int): EitherT[Task, String, Option[Snack]] = EitherT.fromEither[Task] {
+    Right(Option(Snack(123, "Chocolate", SnackType.Sweet, 1, 10.20)))
   }
 }

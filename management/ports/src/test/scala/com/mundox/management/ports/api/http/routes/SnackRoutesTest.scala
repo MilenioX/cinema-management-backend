@@ -1,7 +1,7 @@
 package com.mundox.management.ports.api.http.routes
 
 import akka.http.scaladsl.model.MediaTypes
-import akka.http.scaladsl.model.StatusCodes.OK
+import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.model.headers.`Content-Type`
 import com.mundox.management.ports.api.http.responses.SnackResponseDTO
 import com.mundox.management.ports.{TestEnvironment, TestSpec}
@@ -24,6 +24,14 @@ class SnackRoutesTest extends TestSpec with JsonSupport {
       status shouldEqual OK
       header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
       responseAs[SnackResponseDTO] shouldEqual SnackResponseDTO(123, "Chocolate", 10.20)
+    }
+  }
+
+  "The get snacks by id service" should "return a validation error" in {
+    Get("/management/snacks/abc") ~> apiRoutes.routes ~> check {
+      status shouldEqual InternalServerError
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[String] shouldEqual "id has a non valid value."
     }
   }
 }
