@@ -7,7 +7,7 @@ import com.mundox.management.ports.api.http.JsonSupport
 import akka.http.scaladsl.server.Directives._
 import cats.data.EitherT
 import com.mundox.management.core.domain.snacks.Snack
-import com.mundox.management.core.exceptions.ManagementException
+import com.mundox.management.core.typeclasses.TransformerSyntax._
 import com.mundox.management.core.queries.SnacksQuery
 import com.mundox.management.ports.api.http.requests.CommonValidations
 import com.mundox.management.ports.api.http.responses.SnackResponseDTO
@@ -36,7 +36,7 @@ class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
                 complete(StatusCodes.InternalServerError)
               case Right(snacks) =>
                 loggerInfo(s"Success response in getAllSnacks service")
-                complete(StatusCodes.OK -> snacks.map(SnackResponseDTO(_)))
+                complete(StatusCodes.OK -> snacks.map(_.asType[SnackResponseDTO]))
             }
           case Failure(exception) =>
             loggerInfo(s"There was an error getting the records $exception")
@@ -62,7 +62,7 @@ class SnackRoutes(query: SnacksQuery[Task]) extends Logger with JsonSupport {
             case Right(value) => value match {
               case Some(snack) =>
                 loggerInfo(s"Success response in getAllSnacksById service")
-                complete(StatusCodes.OK -> SnackResponseDTO(snack))
+                complete(StatusCodes.OK -> snack.asType[SnackResponseDTO])
               case None =>
                 loggerInfo(s"Empty response in getAllSnacksById service")
                 complete(StatusCodes.NotFound)
