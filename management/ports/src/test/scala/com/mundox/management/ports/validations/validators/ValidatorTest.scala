@@ -7,11 +7,11 @@ import com.mundox.management.ports.TestSpec
 class ValidatorTest extends TestSpec {
 
   "Validate special characters with space" should "return Invalid when the input is not valid" in {
-    Validator.validateSpecialCharactersWithSpaces("field", "ab$#c -.ajs,") shouldEqual Left(ValueHasSpecialCharacters("field"))
+    Validator.validateLettersAndNumbersWithSpaces("field", "ab$#c -.ajs,") shouldEqual Left(ValueHasSpecialCharacters("field"))
   }
 
   "Validate special characters with space" should "return the value when the value is correct" in {
-    Validator.validateSpecialCharactersWithSpaces("field", "Testing Movie") shouldEqual Right("Testing Movie")
+    Validator.validateLettersAndNumbersWithSpaces("field", "Testing Movie") shouldEqual Right("Testing Movie")
   }
 
   "Validate minLength" should "return Invalid when the input is not valid" in {

@@ -19,7 +19,7 @@ object DummyCreateMovieRequestDTO {
 
   def validate(input: DummyCreateMovieRequestDTO): Either[ManagementException, DummyCreateMovieRequestDTO] =
     (for {
-      _ <- Validator.validateSpecialCharactersWithSpaces("title", input.title)
+      _ <- Validator.validateLettersAndNumbersWithSpaces("title", input.title)
       _ <- Validator.validateMinLength("title", input.title, 5)
       title <- Validator.validateMaxLength("title", input.title, 20)
     } yield {
@@ -29,7 +29,7 @@ object DummyCreateMovieRequestDTO {
   def validateNec(input: DummyCreateMovieRequestDTO): EitherT[Future,ManagementException, DummyCreateMovieRequestDTO] =
     EitherT {
       Future.successful(
-        (ValidatorNec.validateSpecialCharactersWithSpaces("title", input.title),
+        (ValidatorNec.validateLettersAndNumbersWithSpaces("title", input.title),
           ValidatorNec.validateMinLength("title", input.title, 5),
           ValidatorNec.validateMaxLength("title", input.title, 20))
           .mapN((_, _, _) => DummyCreateMovieRequestDTO(input.title)).toEither.leftMap(validation => ValidationError(validation.toList))

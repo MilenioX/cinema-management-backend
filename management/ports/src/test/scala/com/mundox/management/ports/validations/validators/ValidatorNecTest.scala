@@ -9,11 +9,11 @@ import com.mundox.management.ports.TestSpec
 class ValidatorNecTest extends TestSpec {
 
   "Validate special characters with space" should "return Invalid when the input is not valid" in {
-    ValidatorNec.validateSpecialCharactersWithSpaces("field", "ab$#c -.ajs,") shouldEqual Invalid(Chain(ValueHasSpecialCharacters("field")))
+    ValidatorNec.validateLettersAndNumbersWithSpaces("field", "ab$#c -.ajs,") shouldEqual Invalid(Chain(ValueHasSpecialCharacters("field")))
   }
 
   "Validate special characters with space" should "return the value when the value is correct" in {
-    ValidatorNec.validateSpecialCharactersWithSpaces("field", "Testing Movie") shouldEqual Valid("Testing Movie")
+    ValidatorNec.validateLettersAndNumbersWithSpaces("field", "Testing Movie") shouldEqual Valid("Testing Movie")
   }
 
   "Validate minLength" should "return Invalid when the input is not valid" in {
