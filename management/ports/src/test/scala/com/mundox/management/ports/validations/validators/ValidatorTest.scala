@@ -42,6 +42,19 @@ class ValidatorTest extends TestSpec {
     Validator.validateIsNumber("field", "#$") shouldEqual Left(ValueIsNotValid("field"))
   }
 
+  "Validate is Double" should "return an Integer when the value is a number" in {
+    Validator.validateIsDouble("field", "123.45") shouldEqual Right(123.45)
+  }
+
+  "Validate is Double" should "return Invalid when the value has letters" in {
+    Validator.validateIsDouble("field", "1ABC.43") shouldEqual Left(ValueIsNotValid("field"))
+  }
+
+  "Validate is Double" should "return Invalid when the value has special characters" in {
+    Validator.validateIsDouble("field", "#$") shouldEqual Left(ValueIsNotValid("field"))
+  }
+
+
   "Validate number gt zero" should "return an Integer when the value is greater than zero" in {
     Validator.validateNumberGreaterThanZero("field", 111) shouldEqual Right(111)
   }
@@ -49,6 +62,15 @@ class ValidatorTest extends TestSpec {
   "Validate number gt zero" should "return Invalid when the value is lower or equal than zero" in {
     Validator.validateNumberGreaterThanZero("field", 0) shouldEqual Left(ValueIsNotValid("field"))
     Validator.validateNumberGreaterThanZero("field", -101) shouldEqual Left(ValueIsNotValid("field"))
+  }
+
+  "Validate number greater or equal than zero" should "return an Integer when the value is equal and greater than zero " in {
+    Validator.validateNumberGreaterOrEqualThanZero("field", 0) shouldEqual Right(0)
+    Validator.validateNumberGreaterOrEqualThanZero("field", 111) shouldEqual Right(111)
+  }
+
+  "Validate number greater or equal than zero" should "return Invalid when the value is lower or equal than zero" in {
+    Validator.validateNumberGreaterOrEqualThanZero("field", -101) shouldEqual Left(ValueIsNotValid("field"))
   }
 
 }

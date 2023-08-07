@@ -36,11 +36,25 @@ trait ValidatorNec {
         ValueIsNotValid(field).invalidNec[Int]
     }
 
-  def validateNumberGreaterThanZero(field: String, value: Int): ValidationResult[Int] =
+  def validateIsDouble(field: String, value: String): ValidationResult[Double] =
+    try {
+      value.toDouble.validNec[Validation]
+    } catch {
+      case _: NumberFormatException =>
+        ValueIsNotValid(field).invalidNec[Double]
+    }
+
+  def validateNumberGreaterThanZero(field: String, value: Double): ValidationResult[Double] =
     if (value > 0)
       value.validNec[Validation]
     else
-      ValueIsNotValid(field).invalidNec[Int]
+      ValueIsNotValid(field).invalidNec[Double]
+
+  def validateNumberGreaterOrEqualThanZero(field: String, value: Double): ValidationResult[Double] =
+    if (value >= 0)
+      value.validNec[Validation]
+    else
+      ValueIsNotValid(field).invalidNec[Double]
 }
 
 object ValidatorNec extends ValidatorNec

@@ -37,9 +37,24 @@ sealed trait Validator {
         Left(ValueIsNotValid(field))
     }
 
+  def validateIsDouble(field: String, value: String): ValidationResult[Double] =
+    try {
+      Right(value.toDouble)
+    } catch {
+      case _: NumberFormatException =>
+        Left(ValueIsNotValid(field))
+    }
+
   def validateNumberGreaterThanZero(field: String, value: Int): ValidationResult[Int] =
     Either.cond(
       value > 0,
+      value,
+      ValueIsNotValid(field)
+    )
+
+  def validateNumberGreaterOrEqualThanZero(field: String, value: Int): ValidationResult[Int] =
+    Either.cond(
+      value >= 0,
       value,
       ValueIsNotValid(field)
     )
