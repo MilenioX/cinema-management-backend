@@ -1,6 +1,6 @@
 package com.mundox.management.ports.api.http.routes
 
-import akka.http.scaladsl.model.MediaTypes
+import akka.http.scaladsl.model.{ContentTypes, MediaTypes}
 import akka.http.scaladsl.model.StatusCodes.{InternalServerError, NotFound, OK}
 import akka.http.scaladsl.model.headers.`Content-Type`
 import com.mundox.management.ports.api.http.responses.SnackResponseDTO
@@ -32,6 +32,25 @@ class SnackRoutesTest extends TestSpec with JsonSupport {
       status shouldEqual InternalServerError
       header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
       responseAs[String] shouldEqual "id has a non valid value."
+    }
+  }
+
+  "The add snack service" should "return the added snack" in {
+    Post("/management/snacks").withEntity(ContentTypes.`application/json`, "{\"name\": \"Arepas\", \"snackType\": \"Salty Snacks\", \"quantity\": 25, \"price\": 2.75}") ~> apiRoutes.routes ~> check {
+      status shouldEqual OK
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      val response = responseAs[SnackResponseDTO]
+      response.name shouldEqual "Arepas"
+      response.id shouldBe 0
+      response.price shouldEqual 2.75
+    }
+  }
+
+  "The add snack service" should "validate each input value" in {
+    Post("/management/snacks").withEntity(ContentTypes.`application/json`, "{\"name\": \"Arepas #@@a\", \"snackType\": \"Salty $#@Snacks\", \"quantity\": -25, \"price\": -2.75}") ~> apiRoutes.routes ~> check {
+      status shouldEqual InternalServerError
+      header("Content-Type").getOrElse("Empty") shouldEqual `Content-Type`(MediaTypes.`application/json`)
+      responseAs[String] shouldEqual "Name must not contain special characters.,Snack Type must not contain special characters.,Quantity has a non valid value.,Price has a non valid value."
     }
   }
 }
